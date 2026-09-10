@@ -3,7 +3,7 @@ title: "Billboard Graphic"
 execute:
   echo: false
 ---
-
+My name is Jonas Noury and I go to New College of Florida.
 ```{r}
 #| message: false
 library(tidyverse)
