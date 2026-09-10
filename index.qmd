@@ -1,0 +1,50 @@
+---
+title: "Billboard Graphic"
+execute:
+  echo: false
+---
+
+```{r}
+#| message: false
+library(tidyverse)
+```
+
+```{r}
+billboard_long <- billboard |>
+  pivot_longer(
+    cols = starts_with("wk"),
+    names_to = "week",
+    names_prefix = "wk",
+    values_to = "rank",
+    values_drop_na = TRUE
+  ) |>
+  mutate(week = as.integer(week))
+
+featured_tracks <- billboard_long |>
+  group_by(track, artist) |>
+  summarise(best_rank = min(rank), .groups = "drop") |>
+  slice_min(best_rank, n = 8, with_ties = FALSE) |>
+  pull(track)
+
+billboard_long |>
+  filter(track %in% featured_tracks) |>
+  ggplot(aes(x = week, y = rank, group = track, color = artist)) +
+  geom_line(linewidth = 1.1, alpha = 0.85) +
+  geom_point(size = 2, alpha = 0.9) +
+  scale_y_reverse(breaks = c(1, 10, 20, 40, 60, 75)) +
+  scale_x_continuous(breaks = seq(1, 76, by = 5)) +
+  labs(
+    title = "The Songs That Climbed Highest",
+    subtitle = "Weekly Billboard chart position for the top eight tracks",
+    x = "Week on the chart",
+    y = "Chart position",
+    color = "Artist"
+  ) +
+  theme_minimal(base_size = 13) +
+  theme(
+    panel.grid.minor = element_blank(),
+    legend.position = "bottom",
+    plot.title = element_text(face = "bold", size = 20),
+    plot.subtitle = element_text(color = "grey40")
+  )
+```
